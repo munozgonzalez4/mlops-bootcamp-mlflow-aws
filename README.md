@@ -1,47 +1,61 @@
 # mlops-bootcamp-mlflow-aws
 
-Idea: use MLflow hosted in AWS EC2 instance (only MLflow, not the whole data science project)
+This project demonstrates how to run MLflow on an AWS EC2 instance while keeping the rest of the machine learning workflow separate from the infrastructure layer.
 
-## MLflow on AWS Setup:
+## Overview
 
-1. Login to AWS console.
-2. Create IAM user with AdministratorAccess
-3. Export the credentials in your AWS CLI by running "aws configure"
-4. Create a s3 bucket
-5. Create EC2 machine (Ubuntu) & add Security groups 5000 port
+The idea is to host MLflow on AWS EC2 and use it as a tracking server for experiments, parameters, metrics, and model artifacts. In this setup, only MLflow is deployed on the cloud server, not the whole data science project.
 
-Run the following command on EC2 machine
+## AWS Setup
+
+1. Sign in to the AWS console.
+2. Create an IAM user with AdministratorAccess.
+3. Configure the AWS CLI locally by running:
+   ```bash
+   aws configure
+   ```
+4. Create an S3 bucket to store MLflow artifacts.
+5. Launch an Ubuntu EC2 instance and open port 5000 in the security group settings.
+
+## EC2 Setup
+
+Run the following commands on the EC2 machine:
+
 ```bash
 sudo apt update
-
-sudo apt install python3-pip
-
-sudo apt install pipenv
-
-sudo apt install virtualenv
+sudo apt install -y python3-pip
+sudo apt install -y pipenv
+sudo apt install -y virtualenv
 
 mkdir mlflow
-
 cd mlflow
 
 pipenv install mlflow
-
 pipenv install awscli
-
 pipenv install boto3
-
 pipenv shell
+```
 
+Then configure your AWS credentials:
 
-## Then set aws credentials
+```bash
 aws configure
+```
 
+Finally, start the MLflow server:
 
-#Finally 
-mlflow server -h 0.0.0.0 --default-artifact-root s3://mlflowtracking1
+```bash
+nohup mlflow server -h 0.0.0.0 --workers 1 --default-artifact-root s3://<your-bucket-name> > mlflow.log 2>&1 &
+```
 
-#open Public IPv4 DNS to the port 5000
+Open the EC2 instance's Public IPv4 DNS on port 5000 to access the MLflow UI.
 
+## Local Configuration
 
-#set uri in your local terminal and in your code 
-export MLFLOW_TRACKING_URI=http://ec2-54-158-152-207.compute-1.amazonaws.com:5000/
+Set the tracking URI in your local terminal and in your code:
+
+```bash
+export MLFLOW_TRACKING_URI=<insert-here>
+```
+
+This URI should point to your EC2 MLflow server endpoint.

@@ -70,7 +70,7 @@ if __name__ == "__main__":
         mlflow.log_metric("mae", mae)
 
         # Setup for the remote AWS server
-        remote_server_uri = ""
+        remote_server_uri = "<insert-here>"
         mlflow.set_tracking_uri(remote_server_uri)
         tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
         if tracking_url_type_store != "file":
